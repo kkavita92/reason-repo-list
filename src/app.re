@@ -1,4 +1,7 @@
-type state = {repoData: RepoData.repo};
+type state = {repoData: option(RepoData.repo)};
+
+type action =
+  | Loaded(RepoData.repo);
 
 let component = ReasonReact.reducerComponent("App");
 
@@ -17,10 +20,21 @@ let str = ReasonReact.stringToElement;
 
 let make = _children => {
   ...component,
-  initialState: () => {repoData: dummyRepo},
-  render: self =>
-    <div className="App">
-      <h1> (str("Reason Projects")) </h1>
-      <RepoItem repo=self.state.repoData />
-    </div>,
+  initialState: () => {repoData: None},
+  reducer: (action, _state) =>
+    switch (action) {
+    | Loaded(loadedRepo) => ReasonReact.Update({repoData: Some(loadedRepo)})
+    },
+  render: self => {
+    let loadReposButton =
+      <button onClick=(self.reduce(_event => Loaded(dummyRepo)))>
+        (str("Load Repos"))
+      </button>;
+    let repoItem =
+      switch (self.state.repoData) {
+      | Some(repo) => <RepoItem repo />
+      | None => loadReposButton
+      };
+    <div className="App"> <h1> (str("Reason Projects")) </h1> repoItem </div>;
+  },
 };
