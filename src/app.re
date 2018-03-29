@@ -1,5 +1,6 @@
 type state = {repoData: option(array(RepoData.repo))};
 
+/* Enumerates kinds of possible state changes which can happen in our component */
 type action =
   | Loaded(array(RepoData.repo));
 
@@ -27,7 +28,7 @@ let str = ReasonReact.stringToElement;
 
 let make = _children => {
   ...component,
-  initialState: () => {repoData: None},
+  initialState: () => {repoData: None}, /* Make initial state None which changes once user clicks on a button */
   reducer: (action, _state) =>
     switch (action) {
     | Loaded(loadedRepo) => ReasonReact.Update({repoData: Some(loadedRepo)})
@@ -35,8 +36,8 @@ let make = _children => {
   render: self => {
     let loadReposButton =
       <button onClick=(self.reduce(_event => Loaded(dummyRepos)))>
-        (str("Load Repos"))
-      </button>;
+        /* self.reduce takes a function which translates click into an action for our reducer */
+         (str("Load Repos")) </button>;
     let repoItems =
       switch (self.state.repoData) {
       | Some(repos) =>
@@ -46,7 +47,7 @@ let make = _children => {
             repos,
           ),
         )
-      | None => loadReposButton
+      | None => loadReposButton /* Button to be displayed in place in initial blank state */
       };
     <div className="App">
       <h1> (str("Reason Projects")) </h1>
